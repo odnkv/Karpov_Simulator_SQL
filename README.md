@@ -153,6 +153,24 @@ ORDER BY order_id asc limit 1000
 
 ```sql
 
+WITH 
+subq_1 AS (SELECT 
+COUNT(DISTINCT order_id) AS orders_count,
+user_id
+FROM user_actions
+WHERE action = 'create_order'
+GROUP BY user_id),
 
+subq_2 AS (SELECT ROUND(AVG(orders_count),2) AS orders_avg FROM subq_1)
+
+SELECT 
+user_id, 
+orders_count, 
+(SELECT * FROM subq_2) AS orders_avg,
+orders_count - (SELECT * FROM subq_2) AS orders_diff
+
+FROM subq_1 
+ORDER BY user_id 
+LIMIT 1000
 
 ```
