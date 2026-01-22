@@ -64,7 +64,6 @@ ORDER BY product_id desc
 
 ```
 
-
 #### [Задача 4](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/257124)
 Выведите информацию о товарах в таблице `products`, цена на которые превышает среднюю цену всех товаров на 20 рублей и более. Результат отсортируйте по убыванию `id` товара.
 
@@ -89,9 +88,11 @@ ORDER BY product_id desc
 
 Поле в результирующей таблице: `users_count`
 
-
-
 ```sql
-
+SELECT
+  COUNT(DISTINCT user_id) AS users_count
+FROM user_actions
+WHERE action = 'create_order' and time BETWEEN (SELECT MAX(time) FROM user_actions) - interval '1 week' 
+AND (SELECT MAX(time) FROM user_actions)
 
 ```
