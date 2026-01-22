@@ -108,6 +108,14 @@ AND (SELECT MAX(time) FROM user_actions)
 
 ```sql
 SELECT
+min(AGE((SELECT MAX(time)::date FROM courier_actions), birth_date))::varchar as min_age
+FROM couriers
+WHERE sex = 'male'
+
+```
+
+```sql
+SELECT
 
 
 ```
