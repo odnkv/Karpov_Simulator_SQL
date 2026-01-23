@@ -35,12 +35,12 @@ FROM   (SELECT count(order_id) as orders_count,
 
 ```sql
 
-with subq_1 as (SELECT count(order_id) as orders_count,
+WITH subq_1 as (SELECT count(order_id) AS orders_count,
                        user_id
                 FROM   user_actions
                 WHERE  action = 'create_order'
                 GROUP BY user_id)
-SELECT round(avg(orders_count), 2) as orders_avg
+SELECT round(avg(orders_count), 2) AS orders_avg
 FROM   subq_1
 
 ```
@@ -54,13 +54,13 @@ FROM   subq_1
 
 ```sql
 
-with subq_1 as (SELECT min(price) as min_price
+WITH subq_1 AS (SELECT min(price) AS min_price
                 FROM   products)
 SELECT *
 FROM   products
 WHERE  price != (SELECT min_price
                  FROM   subq_1)
-ORDER BY product_id desc
+ORDER BY product_id DESC
 
 ```
 
@@ -71,13 +71,13 @@ ORDER BY product_id desc
 
 ```sql
 
-with subq_1 as (SELECT avg(price)+20 as avg_price
+WITH subq_1 AS (SELECT avg(price)+20 AS avg_price
                 FROM   products)
 SELECT *
 FROM   products
 WHERE  price > (SELECT avg_price
                 FROM   subq_1)
-ORDER BY product_id desc
+ORDER BY product_id DESC
 
 ```
 
@@ -92,7 +92,7 @@ ORDER BY product_id desc
 SELECT
   COUNT(DISTINCT user_id) AS users_count
 FROM user_actions
-WHERE action = 'create_order' and time BETWEEN (SELECT MAX(time) FROM user_actions) - interval '1 week' 
+WHERE action = 'create_order' AND time BETWEEN (SELECT MAX(time) FROM user_actions) - interval '1 week' 
 AND (SELECT MAX(time) FROM user_actions)
 
 ```
@@ -108,7 +108,7 @@ AND (SELECT MAX(time) FROM user_actions)
 
 ```sql
 SELECT
-min(AGE((SELECT MAX(time)::date FROM courier_actions), birth_date))::varchar as min_age
+MIN(AGE((SELECT MAX(time)::date FROM courier_actions), birth_date))::varchar AS min_age
 FROM couriers
 WHERE sex = 'male'
 
@@ -125,18 +125,55 @@ WHERE sex = 'male'
 
 ```sql
 
-with subq_1 as (SELECT order_id
+WITH subq_1 AS (SELECT order_id
                 FROM   user_actions
                 WHERE  action = 'cancel_order')
 SELECT order_id
 FROM   user_actions
-WHERE  order_id not in (SELECT *
+WHERE  order_id not IN (SELECT *
                         FROM   subq_1)
-ORDER BY order_id asc limit 1000
+ORDER BY order_id ASC LIMIT 1000
 
 ```
 
 #### [Задача 8](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/257123)
+
+В начале урока мы отметили, что вложенный запрос может располагаться и после оператора SELECT. Однако тогда результатом подзапроса может быть только одно значение — например, результат применения агрегирующей функции к некоторой колонке:
+
+`SELECT column_1, (SELECT MAX(column_1) FROM table) AS max_column_1
+FROM table`
+
+
+В этом примере из таблицы table будет выбрана колонка column_1, и напротив каждого значения в этой колонке будет выведен результат выполнения вложенного запроса, т.е. максимальное значение в колонке. При этом давать алиас результату подзапроса не обязательно.
+
+По сути эта операция равносильно тому, как если бы мы просто проставили одно и то же значение в отдельном столбце, посчитав его вручную:
+
+`SELECT column_1, 1500 AS max_column_1
+FROM table`
+
+
+Разница заключается в том, что с помощью подзапроса мы делаем это значение динамическим и избавляем себя от необходимости постоянно его обновлять.
+
+Также результаты подзапросов в блоке SELECT можно сразу использовать в вычислениях:
+
+`SELECT column_1, (SELECT MAX(column_1) FROM table) - 100 AS column_2
+FROM table`
+
+
+На практике подзапрос в SELECT может использоваться для того, чтобы сравнить значения в колонке с каким-нибудь одним расчётным значением (из той же или другой таблицы):
+
+`SELECT column_1, column_2, column_2 > (SELECT MAX(column_1) FROM table) AS column_3
+FROM table`
+
+
+`На заметку:`
+
+На самом деле для того, чтобы в отдельном столбце вывести расчёты с агрегацией по колонкам в той же таблице, не меняя при этом её структуру, чаще используются не подзапросы, а оконные функции — продвинутый функционал, который мы будем рассматривать в конце первого модуля курса.
+
+Сейчас с помощью имеющихся на данный момент знаний мы попробуем решить задачу, не прибегая к продвинутым инструментам. Можете вернуться к этой задаче после прохождения последнего урока и попробовать решить её с помощью оконных функций.
+
+`Задание:`
+
 Используя данные из таблицы `user_actions`, рассчитайте, сколько заказов сделал каждый пользователь и отразите это в столбце `orders_count`.
 
 В отдельном столбце `orders_avg` напротив каждого пользователя укажите среднее число заказов всех пользователей, округлив его до двух знаков после запятой.
@@ -210,6 +247,18 @@ ORDER BY price DESC, product_id ASC
 ```
 
 #### [Задача 10](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353794)
+НОВАЯ ЗАДАЧА
+
+Всё это время мы решали задачи и даже не задумывались о том, можно ли вообще доверять данным, которые оказались в нашем распоряжении. Но ошибаются не только аналитики — ошибки в расчётах могут быть связаны с проблемами на любом этапе работы с данными. И далеко не все эти этапы мы можем контролировать. Но вместо того, чтобы потом разбираться, кто больше ошибся, лучше заранее убедиться, что в данных нет очевидных несостыковок. Делать это стоит всегда — даже если об этом вас явно не просят.
+
+Впрочем, в своё оправдание мы можем сказать, что раньше у нас было не так много знаний, чтобы что-то проверять. Однако сейчас, когда мы добрались до подзапросов, какие-то очевидные ошибки мы уже можем выявить.
+
+Мы уже знаем, как работает наш сервис: пользователи создают заказы, курьеры их принимают, а затем доставляют, если эти заказы не отменяются. Но может ли быть такое, что какой-то заказ доставляется, но при этом не создаётся? То есть заказ с некоторым id есть в числе доставленных в таблице courier_actions, но его нет среди созданных в таблице user_actions? Вы спросите: разве так может быть? Вполне, если наш сервис работает с ошибками и на каком-то этапе что-то идёт не по плану.
+
+Ну что же, давайте попробуем поискать такие заказы.
+
+`Задание:`
+
 Выясните, есть ли в таблице courier_actions такие заказы, которые были приняты курьерами, но не были созданы пользователями. Посчитайте количество таких заказов.
 
 Колонку с числом заказов назовите `orders_count`.
@@ -221,7 +270,7 @@ ORDER BY price DESC, product_id ASC
 SELECT count(distinct order_id) as orders_count
 FROM   courier_actions
 WHERE  action = 'accept_order'
-   and order_id not in (SELECT DISTINCT order_id
+   and order_id NOT IN (SELECT DISTINCT order_id
                      FROM   user_actions)
 
 ```
@@ -235,10 +284,10 @@ WHERE  action = 'accept_order'
 
 ```sql
 
-SELECT count(distinct order_id) as orders_count
+SELECT count(distinct order_id) AS orders_count
 FROM   courier_actions
 WHERE  action = 'accept_order'
-   and order_id not in (SELECT DISTINCT order_id
+   AND order_id NOT IN (SELECT DISTINCT order_id
                      FROM   user_actions)
 
 ```
@@ -264,13 +313,13 @@ WHERE  action = 'accept_order'
 
 SELECT count(distinct order_id) as orders_count
 FROM   user_actions
-WHERE  order_id not in (SELECT order_id
+WHERE  order_id NOT IN (SELECT order_id
                         FROM   courier_actions
                         WHERE  action = 'deliver_order')
 
 ```
 
-#### [Задача 11](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353795)
+#### [Задача 12](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353796)
 НОВАЯ ЗАДАЧА
 
 Погодите, а может ли быть так, что курьеры каким-то образом доставляют отменённые заказы? Допустим, курьер привёз заказ, который пользователь отменил в процессе доставки, и в результате мы получили и запись о доставке в таблице `courier_actions`, и запись об отмене в таблице `user_actions`. 
@@ -294,9 +343,46 @@ WHERE  order_id not in (SELECT order_id
 SELECT count(order_id) as orders_canceled,
        count(order_id) filter (WHERE action = 'deliver_order') as orders_canceled_and_delivered
 FROM   courier_actions
-WHERE  order_id in (SELECT order_id
+WHERE  order_id IN (SELECT order_id
                     FROM   user_actions
                     WHERE  action = 'cancel_order')
 
 ```
+
+#### [Задача 13](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353797)
+НОВАЯ ЗАДАЧА
+
+Отлично! Ещё одну проверку на ошибки мы сделали и теперь можем вернуться к недоставленным заказам.
+
+Мы уже выяснили, что такие есть и предположили, что среди них могут быть как заказы, отменённые пользователями, так и заказы, которые ещё не успели доставить.
+
+Количество отменённых заказов мы уже считали. Теперь давайте выясним, есть ли такие заказы, которые не были отменены, но и не были доставлены — то есть заказы, которые находятся в процессе доставки. Таким образом мы поймём, все ли заказы были доставлены на момент обращения к данным.
+
+`Задание:`
+
+По таблицам `courier_actions` и `user_actions` снова определите число недоставленных заказов и среди них посчитайте количество отменённых заказов и количество заказов, которые не были отменены (и соответственно, пока ещё не были доставлены).
+
+Колонку с недоставленными заказами назовите `orders_undelivered`, колонку с отменёнными заказами назовите `orders_canceled`, колонку с заказами «в пути» назовите `orders_in_process`.
+
+Поля в результирующей таблице: `orders_undelivered, orders_canceled, orders_in_process`
+
+`Пояснение:`
+
+Для решения задачи пригодится оператор FILTER, который мы рассматривали в этом уроке.
+
+`На заметку:`
+
+Подзапросы можно также использовать и в операторе FILTER для формирования ещё более продвинутых условий фильтрации. В таком случае конструкция будет иметь следующий вид:
+
+`SELECT COUNT(column) FILTER (WHERE column > (SELECT AVG(column) FROM table)) AS count
+FROM table`
+
+
+Такой запрос посчитает количество значений в колонке column, которые превышают среднее значение по этой же колонке. Разумеется, в подзапросе, указанном в FILTER, можно обращаться и к другим колонкам и таблицам, применяя любые другие способы фильтрации — например, оператор IN:
+
+`SELECT COUNT(column_1) FILTER (WHERE column_1 IN (SELECT column_2 FROM table_2)) AS count
+FROM table_1`
+
+
+Для решения этой задачи использовать подзапросы в операторе FILTER не обязательно, но попробовать можно.
 
