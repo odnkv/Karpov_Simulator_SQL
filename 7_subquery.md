@@ -225,3 +225,49 @@ WHERE  action = 'accept_order'
                      FROM   user_actions)
 
 ```
+
+#### [Задача 10](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353794)
+Выясните, есть ли в таблице courier_actions такие заказы, которые были приняты курьерами, но не были созданы пользователями. Посчитайте количество таких заказов.
+
+Колонку с числом заказов назовите `orders_count`.
+
+Поле в результирующей таблице: `orders_count`
+
+```sql
+
+SELECT count(distinct order_id) as orders_count
+FROM   courier_actions
+WHERE  action = 'accept_order'
+   and order_id not in (SELECT DISTINCT order_id
+                     FROM   user_actions)
+
+```
+
+#### [Задача 11](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353795)
+НОВАЯ ЗАДАЧА
+
+Хорошо, проверку на наличие очевидных ошибок мы сделали. Теперь давайте копнём немного глубже.
+
+Мы знаем, что в данных о действиях курьеров есть две отметки времени: время принятия и время доставки заказа. Но все ли из принятых заказов числятся в данных как доставленные? Вряд ли, потому что заказ, во-первых, могли отменить, а во-вторых, его могли просто не успеть доставить.
+
+Давайте проверим, так ли это на самом деле. Для начала просто определим заказы, которые не доставили.
+
+Задание:
+
+Выясните, есть ли в таблице user_actions такие заказы, которые были приняты курьерами, но не были доставлены пользователям: у заказа нет записи с действием 'deliver_order' в таблице `courier_actions`. Посчитайте уникальное количество таких заказов: используйте count(distinct order_id).
+
+Колонку с числом заказов назовите `orders_count`.
+
+Поле в результирующей таблице: `orders_count`
+
+```sql
+
+SELECT count(distinct order_id) as orders_count
+FROM   user_actions
+WHERE  order_id not in (SELECT order_id
+                        FROM   courier_actions
+                        WHERE  action = 'deliver_order')
+
+```
+
+
