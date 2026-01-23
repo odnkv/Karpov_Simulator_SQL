@@ -919,5 +919,12 @@ ORDER BY courier_id ASC
 
 ```sql
 
+SELECT
+ROUND(AVG(array_length(product_ids, 1)),3) AS avg_order_size
+FROM orders
+WHERE order_id IN
+(SELECT order_id
+FROM user_actions
+WHERE user_id IN (SELECT user_id FROM users WHERE sex = 'male') AND action = 'cancel_order')
 
 ```
