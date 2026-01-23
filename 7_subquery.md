@@ -834,3 +834,67 @@ FROM users
 WHERE sex = 'male' AND birth_date < (SELECT MIN(birth_date) FROM users WHERE sex = 'female')
 ORDER BY user_id ASC
 ```
+
+#### [Задача 15](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/257128)
+
+Теперь давайте попробуем отфильтровать заказы в одной таблице, учитывая дополнительную информацию о заказах в другой.
+
+`Задание:`
+
+Выведите `id` и содержимое 100 последних доставленных заказов из таблицы `orders`.
+
+Содержимым заказов считаются списки с `id` входящих в заказ товаров. Результат отсортируйте по возрастанию `id` заказа.
+
+Поля в результирующей таблице: `order_id, product_ids`
+
+`Пояснение:`
+
+Обратите внимание, что содержимое заказов находится в таблице orders, а информация о действиях с заказами — в таблице courier_actions.
+
+
+```sql
+
+SELECT 
+order_id,
+product_ids
+FROM orders
+WHERE order_id IN
+(SELECT order_id FROM courier_actions WHERE action = 'deliver_order' ORDER BY time DESC LIMIT 100)
+ORDER BY order_id ASC
+LIMIT 100
+
+```
+
+#### [Задача 16](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/257129)
+В этом задании попробуем узнать пол и возраст самых результативных курьеров, руководствуясь данными о доставке заказов.
+
+`Задание:`
+
+Из таблицы `couriers` выведите всю информацию о курьерах, которые в сентябре 2022 года доставили 30 и более заказов. Результат отсортируйте по возрастанию `id` курьера.
+
+Поля в результирующей таблице: `courier_id, birth_date, sex`
+
+`Пояснение:`
+
+Обратите внимание, что информация о курьерах находится в таблице couriers, а информация о действиях с заказами — в таблице courier_actions.
+
+```sql
+
+WITH 
+subq_1 AS (SELECT 
+COUNT(order_id), 
+courier_id 
+FROM courier_actions 
+WHERE action = 'deliver_order' AND DATE_PART('year', time) = 2022 AND DATE_PART('month', time) = 9
+GROUP BY courier_id
+HAVING COUNT(order_id)>=30)
+
+SELECT 
+courier_id, 
+birth_date, 
+sex
+FROM couriers
+WHERE courier_id IN (SELECT courier_id FROM subq_1)
+ORDER BY courier_id ASC
+
+```
