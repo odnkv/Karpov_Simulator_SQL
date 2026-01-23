@@ -391,6 +391,17 @@ ON ua.user_id = u.user_id
 
 ```sql
 
-
+SELECT ua.user_id as user_id_left,
+       u.user_id as user_id_right,
+       order_id,
+       time,
+       action,
+       sex,
+       birth_date
+FROM   user_actions as ua
+    LEFT JOIN users as u
+        ON ua.user_id = u.user_id
+WHERE  u.user_id is not null
+ORDER BY ua.user_id asc
 
 ```
