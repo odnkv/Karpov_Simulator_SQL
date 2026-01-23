@@ -812,3 +812,25 @@ FROM courier_actions
 WHERE order_id NOT IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order'))
 
 ```
+
+
+#### [Задача 14](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353798)
+
+Перед тем как двигаться дальше, предлагаем вам решить ещё несколько задач на подзапросы.
+
+`Задание:`
+
+Отберите из таблицы `users` пользователей мужского пола, которые старше всех пользователей женского пола.
+
+Выведите две колонки: `id` пользователя и дату рождения. Результат отсортируйте по возрастанию `id` пользователя.
+
+Поля в результирующей таблице: `user_id, birth_date`
+
+```sql
+SELECT 
+user_id, 
+birth_date
+FROM users
+WHERE sex = 'male' AND birth_date < (SELECT MIN(birth_date) FROM users WHERE sex = 'female')
+ORDER BY user_id ASC
+```
