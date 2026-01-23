@@ -809,6 +809,6 @@ FROM user_actions
 WHERE order_id IN
 (SELECT order_id
 FROM courier_actions 
-WHERE order_id NOT IN (SELECT COUNT(order_id) FROM user_actions WHERE action = 'cancel_order'))
+WHERE order_id NOT IN (SELECT order_id FROM courier_actions WHERE action = 'deliver_order'))
 
 ```
