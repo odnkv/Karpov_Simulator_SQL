@@ -691,25 +691,6 @@ WHERE  action = 'accept_order'
 
 ```
 
-#### [Задача 10](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353794)
-
-<details>
-Выясните, есть ли в таблице courier_actions такие заказы, которые были приняты курьерами, но не были созданы пользователями. Посчитайте количество таких заказов.
-
-Колонку с числом заказов назовите `orders_count`.
-
-Поле в результирующей таблице: `orders_count`
-
-```sql
-
-SELECT count(distinct order_id) AS orders_count
-FROM   courier_actions
-WHERE  action = 'accept_order'
-   AND order_id NOT IN (SELECT DISTINCT order_id
-                     FROM   user_actions)
-
-```
-
 #### [Задача 11](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353795)
 НОВАЯ ЗАДАЧА
 
