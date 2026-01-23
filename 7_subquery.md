@@ -50,8 +50,8 @@ SELECT sex, COUNT(user_id) AS users_count
 FROM users
 GROUP BY sex
 HAVING sex = 'male'
-```
 
+```
 
 Но то же самое можно сделать и с помощью подзапроса:
 
