@@ -339,5 +339,13 @@ FROM table_A as A
 
 ```sql
 
+SELECT
+ua.user_id as user_id_left,
+u.user_id as user_id_right,
+order_id, time, action, sex, birth_date
+FROM user_actions AS ua
+LEFT JOIN users AS u
+ON ua.user_id = u.user_id
+ORDER BY ua.user_id ASC
 
 ```
