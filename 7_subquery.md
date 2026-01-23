@@ -801,6 +801,14 @@ FROM table_1
 
 ```sql
 
-
+SELECT 
+COUNT(DISTINCT order_id) AS orders_undelivered,
+COUNT(order_id) FILTER (WHERE action = 'cancel_order') AS orders_canceled,
+COUNT(distinct order_id) - COUNT(order_id) FILTER (WHERE action = 'cancel_order') AS orders_in_process
+FROM user_actions
+WHERE order_id IN
+(SELECT order_id
+FROM courier_actions 
+WHERE order_id NOT IN (SELECT COUNT(order_id) FROM user_actions WHERE action = 'cancel_order'))
 
 ```
