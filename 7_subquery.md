@@ -218,6 +218,10 @@ ORDER BY price DESC, product_id ASC
 
 ```sql
 
-
+SELECT count(distinct order_id) as orders_count
+FROM   courier_actions
+WHERE  action = 'accept_order'
+   and order_id not in (SELECT DISTINCT order_id
+                     FROM   user_actions)
 
 ```
