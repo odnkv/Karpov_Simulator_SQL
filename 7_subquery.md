@@ -190,6 +190,34 @@ LIMIT 1000
 
 ```sql
 
+WITH 
+subq_1 AS (SELECT ROUND(AVG(price),2) AS avg_price
+FROM products)
+
+SELECT 
+product_id,
+name,
+price,
+
+CASE 
+    WHEN price >= (SELECT avg_price FROM subq_1)+50 THEN price*0.85
+    WHEN price <= (SELECT avg_price FROM subq_1)-50 THEN price*0.9
+    ELSE price
+END AS new_price
+FROM products 
+ORDER BY price DESC, product_id ASC
+
+```
+
+#### [Задача 10](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/353794)
+Выясните, есть ли в таблице courier_actions такие заказы, которые были приняты курьерами, но не были созданы пользователями. Посчитайте количество таких заказов.
+
+Колонку с числом заказов назовите `orders_count`.
+
+Поле в результирующей таблице: `orders_count`
+
+```sql
+
 
 
 ```
