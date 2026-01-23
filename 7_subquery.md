@@ -1001,7 +1001,20 @@ SELECT EXTRACT(epoch FROM INTERVAL '3 days, 1:21:32')
 
 ```sql
 
-
+SELECT order_id,
+       MIN(time) AS time_accepted,
+       MAX(time) AS time_delivered,
+       (extract(epoch
+FROM   MAX(time)-MIN(time))/60)::integer AS delivery_time
+FROM   courier_actions
+WHERE  order_id IN (SELECT order_id
+                    FROM   orders
+                    WHERE  array_length(product_ids, 1) > 5)
+   and order_id NOT IN (SELECT order_id
+                     FROM   user_actions
+                     WHERE  action = 'cancel_order')
+GROUP BY order_id
+ORDER BY order_id ASC
 
 ```
 
