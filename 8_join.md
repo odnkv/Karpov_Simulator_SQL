@@ -211,6 +211,15 @@ FROM table_A as A
 
 ```sql
 
-
+SELECT u.user_id as user_id_left,
+       ua.user_id as user_id_right,
+       order_id,
+       time,
+       action,
+       sex,
+       birth_date
+FROM   users as u join user_actions as ua
+        ON u.user_id = ua.user_id
+ORDER BY u.user_id asc
 
 ```
