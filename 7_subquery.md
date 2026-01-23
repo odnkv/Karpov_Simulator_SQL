@@ -955,7 +955,16 @@ WHERE user_id IN (SELECT user_id FROM users WHERE sex = 'male') AND action = 'ca
 
 ```sql
 
+WITH 
+subq_1 AS (SELECT user_id,
+date_part('year', age((SELECT MAX(time) FROM user_actions), birth_date)) as age
+FROM users)
 
+SELECT user_id,
+       coalesce(age, (SELECT round(avg(age))
+               FROM subq_1))::integer as age
+FROM subq_1
+ORDER BY user_id ASC
 
 ```
 
