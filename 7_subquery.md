@@ -1042,7 +1042,16 @@ ORDER BY order_id ASC
 
 ```sql
 
-
+SELECT first_order_date AS date,
+COUNT(user_id) AS first_orders
+FROM (
+SELECT user_id,
+MIN(time)::date AS first_order_date
+FROM user_actions
+WHERE order_id NOT IN (SELECT order_id FROM user_actions WHERE action = 'cancel_order')
+GROUP BY user_id ) AS first
+GROUP BY first_order_date
+ORDER BY date
 
 ```
 
