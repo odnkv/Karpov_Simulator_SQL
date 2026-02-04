@@ -634,9 +634,9 @@ FROM users
 
 `На заметку:`
 
-Подробнее про операцию `UNION` можно узнать здесь. Про `EXCEPT` — здесь. Про `INTERSECT` — тут.
+Подробнее про операцию `UNION` можно узнать [здесь](https://neon.com/postgresql/postgresql-tutorial/postgresql-union). Про `EXCEPT` — [здесь](https://neon.com/postgresql/postgresql-tutorial/postgresql-except). Про `INTERSECT` — [тут](https://neon.com/postgresql/postgresql-tutorial/postgresql-intersect).
 
-О теории множеств можно почитать [здесь] (https://ru.wikipedia.org/wiki/%D0%A2%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BC%D0%BD%D0%BE%D0%B6%D0%B5%D1%81%D1%82%D0%B2#%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5_%D0%BF%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D1%8F)
+О теории множеств можно почитать [здесь](https://ru.wikipedia.org/wiki/%D0%A2%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BC%D0%BD%D0%BE%D0%B6%D0%B5%D1%81%D1%82%D0%B2#%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5_%D0%BF%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D1%8F)
 
 </details>
 
@@ -663,6 +663,16 @@ WHERE birth_date IS NOT NULL
 
 ```sql
 
+WITH subq_1 AS 
+(SELECT birth_date
+FROM users
+WHERE birth_date IS NOT NULL
+UNION
+SELECT birth_date
+FROM couriers
+WHERE birth_date IS NOT NULL)
 
+SELECT count(birth_date) AS dates_count
+FROM subq_1 
 
 ```
