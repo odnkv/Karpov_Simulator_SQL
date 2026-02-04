@@ -187,7 +187,7 @@ FROM user_actions
 
 </details>
 
-`Задание:`
+`Задание:` INNER JOIN
 
 Объедините таблицы `user_actions` и `users` по ключу `user_id`. В результат включите две колонки с `user_id` из обеих таблиц. Эти две колонки назовите соответственно `user_id_left` и `user_id_right`. Также в результат включите колонки `order_id, time, action, sex, birth_date`. Отсортируйте получившуюся таблицу по возрастанию `id` пользователя (в любой из двух колонок с id).
 
@@ -228,7 +228,7 @@ ORDER BY u.user_id asc
 
 #### [Задача 2](https://lab.karpov.courses/learning/152/module/1762/lesson/17929/53217/257154)
 
-`Задание:`
+`Задание:` INNER JOIN
 
 А теперь попробуйте немного переписать запрос из прошлого задания и посчитать количество уникальных `id` в объединённой таблице. То есть снова объедините таблицы, но в этот раз просто посчитайте уникальные `user_id` в одной из колонок с `id`. Выведите это количество в качестве результата. Колонку с посчитанным значением назовите `users_count`.
 
@@ -326,7 +326,7 @@ FROM table_A as A
 А теперь рассмотрим всё на примере наших данных.
 </details>
 
-`Задание:`
+`Задание:` LEFT JOIN
 
 С помощью `LEFT JOIN` объедините таблицы `user_actions` и `users` по ключу `user_id`. 
 Обратите внимание на порядок таблиц — слева `user_actions`, справа `users`. 
@@ -354,7 +354,7 @@ ORDER BY ua.user_id ASC
 
 #### [Задача 4](https://lab.karpov.courses/learning/152/module/1762/lesson/17929/53217/257155)
 
-`Задание:`
+`Задание:` LEFT JOIN
 
 Теперь снова попробуйте немного переписать запрос из прошлого задания и посчитайте количество уникальных `id` в колонке `user_id`, пришедшей из левой таблицы `user_actions`. Выведите это количество в качестве результата. Колонку с посчитанным значением назовите `users_count`.
 
@@ -381,7 +381,7 @@ ON ua.user_id = u.user_id
 А теперь давайте провернём один трюк.
 </details>
 
-`Задание:`
+`Задание:` LEFT JOIN
 
 Возьмите запрос из задания 3, где вы объединяли таблицы `user_actions` и `users` с помощью `LEFT JOIN`, добавьте к запросу оператор `WHERE` и исключите `NULL` значения в колонке `user_id` из правой таблицы. Включите в результат все те же колонки и отсортируйте получившуюся таблицу по возрастанию `id` пользователя в колонке из левой таблицы.
 
@@ -490,7 +490,7 @@ GROUP BY birth_date
 
 </details>
 
-`Задание:`
+`Задание:` FULL JOIN
 
 С помощью `FULL JOIN` объедините по ключу `birth_date` таблицы, полученные в результате вышеуказанных запросов (то есть объедините друг с другом два подзапроса). Не нужно изменять их, просто добавьте нужный `JOIN`.
 
@@ -529,6 +529,25 @@ SELECT  ...
 
 ```sql
 
+SELECT 
+a.birth_date AS users_birth_date,
+b.birth_date AS couriers_birth_date,
+users_count,
+couriers_count
+    FROM ( 
+        SELECT birth_date, COUNT(user_id) AS users_count 
+        FROM users 
+        WHERE birth_date IS NOT NULL 
+        GROUP BY birth_date 
+    ) a 
+    FULL JOIN ( 
+        SELECT birth_date, COUNT(courier_id) AS couriers_count 
+        FROM couriers 
+        WHERE birth_date IS NOT NULL 
+        GROUP BY birth_date 
+    ) b 
+ON a.birth_date = b.birth_date
+    ORDER BY users_birth_date ASC, couriers_birth_date ASC
 
 ```
 
@@ -644,24 +663,6 @@ WHERE birth_date IS NOT NULL
 
 ```sql
 
-SELECT 
-a.birth_date AS users_birth_date,
-b.birth_date AS couriers_birth_date,
-users_count,
-couriers_count
-    FROM ( 
-        SELECT birth_date, COUNT(user_id) AS users_count 
-        FROM users 
-        WHERE birth_date IS NOT NULL 
-        GROUP BY birth_date 
-    ) a 
-    FULL JOIN ( 
-        SELECT birth_date, COUNT(courier_id) AS couriers_count 
-        FROM couriers 
-        WHERE birth_date IS NOT NULL 
-        GROUP BY birth_date 
-    ) b 
-ON a.birth_date = b.birth_date
-    ORDER BY users_birth_date ASC, couriers_birth_date ASC
+
 
 ```
