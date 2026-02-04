@@ -1219,4 +1219,22 @@ ORDER BY product_id
 
 ```sql
 
+WITH top_5 AS (SELECT product_id
+FROM products
+ORDER BY price DESC
+LIMIT 5), 
+
+id_unnest AS (SELECT
+order_id,
+UNNEST(product_ids) AS product_id, 
+product_ids
+FROM orders)
+
+SELECT 
+DISTINCT order_id,
+product_ids
+FROM id_unnest
+WHERE product_id IN (SELECT * FROM top_5)
+ORDER BY order_id ASC
+
 ```
