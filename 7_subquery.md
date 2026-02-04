@@ -1140,6 +1140,14 @@ FROM orders
 
 ```sql
 
+SELECT
+creation_time, 
+order_id,
+product_ids,
+unnest(product_ids) AS product_id
+FROM orders
+LIMIT 100
+
 ```
 
 #### [Задача 22](https://lab.karpov.courses/learning/152/module/1762/lesson/17928/53213/257136)
